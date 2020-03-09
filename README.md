@@ -10,7 +10,7 @@ When the call to `CreateRemoteThread` happen the payload is still obfuscated sin
 
 # Usage
 
-### Using the C# utlity as a standalone tool
+### Using the C# utility as a standalone tool
 
 Within a beacon it can be executed using the following command.
 
